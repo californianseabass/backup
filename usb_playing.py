@@ -1,26 +1,40 @@
 # /import usb.core
 # import usb.util
 
-import dircache, commands, re
+import dircache, io, os
 from os import listdir
-
-import usb
-for dev in usb.core.find(find_all=True):
-    print "Device:", dev.name
-    print "  idVendor: %d (%s)" % (dev.idVendor, hex(dev.idVendor))
-    print "  idProduct: %d (%s)" % (dev.idProduct, hex(dev.idProduct))
+from os import path
+from os import makedirs
 
 base = '/Volumes/'
 volumes = dircache.listdir(base)
 
 for vol in volumes:
 	if (vol != 'Simba'):
-		path = base + vol
-		print path
-		listdir(path)
-		result = commands.getstatusoutput('cp -r %s /Users/californianseabass/Desktop/' % (path))
-		print result
-
+		curr_path = base + vol + '/'
+		dest_dir = "/Users/californianseabass/Desktop/" + vol
+		print dest_dir
+		if not os.path.isdir(dest_dir):
+			os.mkdir(dest_dir)
+			print "created directory %s" % dest_dir
+		# print curr_path
+		# result = commands.getstatusoutput('cp -r %s /Users/californianseabass/Desktop/' % (path))
+		files = listdir(curr_path)
+		for file_name in files:
+			srcfile = curr_path + file_name
+			if (path.isfile(srcfile)):
+				fd_read = io.open(srcfile, 'rb')
+				if (fd_read.name == "/Volumes/TEST/._.Trashes"):
+					print "dont' do this"
+				else:
+					dest = dest_dir + '/' +file_name
+					dest_buf = open(dest, 'w+')
+					rbuf = io.BufferedReader(fd_read, 4096)
+					data = rbuf.read()
+					while (data):
+						dest_buf.write(data)
+						data = rbuf.read()
+					fd_read.close()
 	else:
 		print "don't touch Simba please!!!"
 
