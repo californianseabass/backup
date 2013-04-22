@@ -2,10 +2,12 @@
 # import usb.util
 
 import dircache, io, os
+from datetime import datetime	
 from os import listdir
 from os import path
 from os import makedirs
 
+startTime = datetime.now()
 base = '/Volumes/'
 volumes = dircache.listdir(base)
 
@@ -13,7 +15,6 @@ for vol in volumes:
 	if (vol != 'Simba'):
 		curr_path = base + vol + '/'
 		dest_dir = "/Users/californianseabass/Desktop/" + vol
-		print dest_dir
 		if not os.path.isdir(dest_dir):
 			os.mkdir(dest_dir)
 			print "created directory %s" % dest_dir
@@ -36,7 +37,9 @@ for vol in volumes:
 						data = rbuf.read()
 					fd_read.close()
 	else:
-		print "don't touch Simba please!!!"
+		print "don't touch Simba please"
+
+print(datetime.now() - startTime)
 
 # base = '/dev/'
 # volumes = dircache.listdir(base)
