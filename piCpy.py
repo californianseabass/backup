@@ -39,3 +39,20 @@ for vol in volumes:
 		print "don't touch Simba please!!!"
 
 print(datetime.now() - startTime)
+
+
+import re
+import subprocess
+device_re = re.compile("Bus\s+(?P<bus>\d+)\s+Device\s+(?P<device>\d+).+ID\s(?P<id>\w+:\w+)\s(?P<tag>.+)$", re.I)
+df = subprocess.check_output("lsusb", shell=True)
+devices = []
+for line in df.split('\n'):
+	print line
+    if re.match("USB High-Speed Bus", line):
+    	print line
+        info = device_re.match(i)
+        if info:
+            dinfo = info.groupdict()
+            dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
+            devices.append(dinfo)
+print devices
