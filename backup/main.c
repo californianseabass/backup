@@ -6,6 +6,14 @@
 //  Copyright (c) 2013 Eric Sebastian Soto. All rights reserved.
 //
 
+/*
+ * Four general steps for discovering devices:
+ * Discover devices using libusb_get_device_list().
+ * Choose the device that you want to operate, and call libusb_open().
+ * Unref all devices in the discovered device list.
+ * Free the discovered device list.
+ */
+
 #include <stdio.h>
 #include <libusb.h>
 
@@ -21,7 +29,7 @@ int main(int argc, const char * argv[])
     ssize_t cnt; //holding number of devices in list
     r = libusb_init(&ctx); //initialize the library for the session we just declared
     if(r < 0) {
-        printf("Init Error"); //there was an error
+        printf("Init Error\n"); //there was an error
         return 1;
     }
     
@@ -53,13 +61,20 @@ void printdev(libusb_device *dev) {
         printf("failed to get device descriptor\n");
         return;
     }
+    if (desc.idVendor == 1452) return;
     printf("Number of possible configurations: %d\n", (int)desc.bNumConfigurations);
     printf("Device Class: %d\n", (int)desc.bDeviceClass);
     printf("VendorID: %d\n", desc.idVendor);
     printf("ProductID: %d\n", desc.idProduct);
     struct libusb_config_descriptor *config;
     libusb_get_config_descriptor(dev, 0, &config);
-    
+    printf("Interfaces: %d\n", config->bNumInterfaces);
+//    const struct libusb_interface *inter;
+//    const struct libusb_interface_descriptor *interdesc;
+//    const struct libusb_endpoint_descriptor *epdesc;
+//    for(int i=0; i<(int)config->bNumInterfaces; i++) {
+//        
+//    }
     
     libusb_free_config_descriptor(config);
 }
