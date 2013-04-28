@@ -54,8 +54,6 @@ int main(int argc, const char * argv[])
 }
 
 
-
-
 void printdev(libusb_device *dev) {
     struct libusb_device_descriptor desc;
     int r = libusb_get_device_descriptor(dev, &desc);
@@ -69,6 +67,9 @@ void printdev(libusb_device *dev) {
     printf("Device Class: %d\n", (int)desc.bDeviceClass);
     printf("VendorID: %d\n", desc.idVendor);
     printf("ProductID: %d\n", desc.idProduct);
+    printf("Device Address: %d\n",  libusb_get_device_address(dev));
+    printf("Serial Number: %d\n", desc.iSerialNumber);
+    printf("Bus number: %d\n", libusb_get_bus_number(dev));
     struct libusb_config_descriptor *config;
     libusb_get_config_descriptor(dev, 0, &config);
     printf("Interfaces: %d\n", config->bNumInterfaces);
