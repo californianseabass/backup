@@ -43,8 +43,10 @@ int main(int argc, const char * argv[])
     }
     printf("devices in list\n");
     ssize_t i; //for iterating through the list
+    libusb_device *src;
     for(i = 0; i < cnt; i++) {
         printdev(devs[i]); //print specs of this device
+
     }
     libusb_free_device_list(devs, 1); //free the list, unref the devices in it
     libusb_exit(ctx); //close the session
@@ -62,6 +64,7 @@ void printdev(libusb_device *dev) {
         return;
     }
     if (desc.idVendor == 1452) return;
+    if (desc.bDeviceClass != 0) return;
     printf("Number of possible configurations: %d\n", (int)desc.bNumConfigurations);
     printf("Device Class: %d\n", (int)desc.bDeviceClass);
     printf("VendorID: %d\n", desc.idVendor);
@@ -69,12 +72,24 @@ void printdev(libusb_device *dev) {
     struct libusb_config_descriptor *config;
     libusb_get_config_descriptor(dev, 0, &config);
     printf("Interfaces: %d\n", config->bNumInterfaces);
-//    const struct libusb_interface *inter;
-//    const struct libusb_interface_descriptor *interdesc;
-//    const struct libusb_endpoint_descriptor *epdesc;
-//    for(int i=0; i<(int)config->bNumInterfaces; i++) {
-//        
-//    }
+    const struct libusb_interface *inter;
+    const struct libusb_interface_descriptor *interdesc;
+    const struct libusb_endpoint_descriptor *epdesc;
+    for(int i=0; i<(int)config->bNumInterfaces; i++) {
+        inter = &config->interface[i];
+        printf("Number of alternate settings: %d\n", inter->num_altsetting);
+        for(int j=0; j<inter->num_altsetting; j++) {
+            interdesc = &inter->altsetting[j];
+            printf("Interface Number: %d | ", (int)interdesc->bInterfaceNumber);
+            printf("Number of endpoints: %d | ", (int)interdesc->bNumEndpoints);
+            for(int k=0; k<(int)interdesc->bNumEndpoints; k++) {
+                epdesc = &interdesc->endpoint[k];
+                printf("Descriptor Type: %d |", (int)epdesc->bDescriptorType);
+                printf("EP Address: %d\n", (int)epdesc->bEndpointAddress);
+            }
+        }
+        
+    }
     
     libusb_free_config_descriptor(config);
 }
